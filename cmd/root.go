@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"fuck-crud/pkg/generator"
-	"fuck-crud/pkg/transform"
+	"github.com/jonyhy96/fuck-crud/pkg/generator"
+	"github.com/jonyhy96/fuck-crud/pkg/transform"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

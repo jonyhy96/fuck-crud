@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fuck-crud/cmd"
+	"github.com/jonyhy96/fuck-crud/cmd"
 )
 
 func main() {

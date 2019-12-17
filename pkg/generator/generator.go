@@ -4,8 +4,8 @@ package generator
 import (
 	"io"
 
-	"fuck-crud/pkg/transform"
-	templateutil "fuck-crud/pkg/util/template"
+	"github.com/jonyhy96/fuck-crud/pkg/transform"
+	templateutil "github.com/jonyhy96/fuck-crud/pkg/util/template"
 )
 
 // Generator generate.
