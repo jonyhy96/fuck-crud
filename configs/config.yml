@@ -1,0 +1,16 @@
+name: tt
+fields: 
+  - field: ID
+    type: uuid.UUID
+  - field: Name
+    type: string
+  - field: Age
+    type: int
+createRequestFields:
+  - field: Name
+    type: string
+  - field: Age
+    type: int
+updateRequestFields:
+  - field: Name
+    type: string
