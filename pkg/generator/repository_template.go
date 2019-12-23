@@ -31,27 +31,33 @@ func (repo *repo) Create({{.Name}} {{upperFirst .Name}}) error {
 	return nil
 }
 
-func (repo *repo) Get(id string) (*{{upperFirst .Name}}, error) {
-	{{.Name}} := &{{upperFirst .Name}}{
-		ID: id,
-	}
-	if err := repo.db.Find(&{{.Name}}).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("%w with id: %s", err, id)
-		}
+func (repo *repo) Get(where {{upperFirst .Name}}) (*{{upperFirst .Name}}, error) {
+	var {{.Name}} {{upperFirst .Name}}
+
+	if err := repo.db.Find(&{{.Name}},where).Error; err != nil {
 		return nil, err
 	}
-	return {{.Name}}, nil
+
+	return &{{.Name}}, nil
 }
 
-func (repo *repo) GetAll() (*[]{{upperFirst .Name}}, error) {
-	{{.Name}}s := &[]{{upperFirst .Name}}{}
-	if err := repo.db.Find(&{{.Name}}s).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("%w", err)
-		}
+func (repo *repo) Count(where {{upperFirst .Name}}) (int, error) {
+	var total int
+
+	if err := repo.db.Model(Datamodel{}).Where(where).Count(&total).Error; err != nil {
+		return 0, err
+	}
+
+	return total, nil
+}
+
+func (repo *repo) GetAll(where {{upperFirst .Name}}, limit int, offset int) ([]{{upperFirst .Name}}, error) {
+	var {{.Name}}s []{{upperFirst .Name}}{}
+
+	if err := repo.db.Limit(limit).Offset(offset).Find(&{{.Name}}s,where).Order("updated_at DESC").Error; err != nil {
 		return nil, err
 	}
+
 	return {{.Name}}s, nil
 }
 
@@ -64,21 +70,3 @@ func (repo *repo) Delete(id string) error {
 }
 `
 )
-
-// type repositoryGenerator struct {
-// 	source transform.Internal
-// }
-
-// // NewRepositoryGenerator returns a new repositoryGenerator.
-// func NewRepositoryGenerator(source transform.Internal) Generator {
-// 	return &repositoryGenerator{source}
-// }
-
-// func (h *repositoryGenerator) Generate(out io.Writer) error {
-// 	t := templateutil.GetTemplate()
-// 	t, err := t.Parse(repositoryTpl)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return t.Execute(out, h.source)
-// }

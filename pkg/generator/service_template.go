@@ -21,22 +21,21 @@ func NewService(rep Repository) Service {
 }
 
 // CreateUser creates a new user.
-func (s *service) Create(createRequest CreateRequest) (string, error) {
+func (s *service) Create(createRequest CreateRequest) (*{{upperFirst .Name}}, error) {
 	uuid, _ := uuid.NewV4()
 	id := uuid.String()
-	{{.Name}} := {{upperFirst .Name}}{
-		ID:               id,
-{{range $fieldType := .CreateRequestFields}}{{"\t"}}{{"\t"}}{{$fieldType.Field}}:{{"\t"}}createRequest.{{$fieldType.Field}},{{"\n"}}{{end}} 
-	}
+	{{.Name}} := createRequest.override({{upperFirst .Name}}{ID: id})
 	if err := s.repository.Create({{.Name}}); err != nil {
-		return "", err
+		return nil, err
 	}
-	return id, nil
+	return &{{.Name}}, nil
 }
 
 // Get get a {{.Name}}.
 func (s *service) Get(id string) (*{{upperFirst .Name}}, error) {
-	{{.Name}}, err := s.repository.Get(id)
+	{{.Name}}, err := s.repository.Get({{upperFirst .Name}}{
+		ID: id,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -44,51 +43,56 @@ func (s *service) Get(id string) (*{{upperFirst .Name}}, error) {
 }
 
 // GetAll get all {{.Name}}.
-func (s *service) GetAll() (*[]{{upperFirst .Name}}, error) {
-	{{.Name}}s, err := s.repository.GetAll()
+func (s *service) GetAll(arguments map[string][]string) (*GetAllResponse, error) {
+	var (
+		total      int
+		err        error
+		{{.Name}} []{{upperFirst .Name}}
+	)
+
+	limit, offset, err := dbutil.Paginate(arguments)
+	if err != nil {
+		if !errors.Is(err, dbutil.ErrNoPageInfo) {
+			return nil, err
+		}
+	}
+
+	total, err = s.repository.Count({{upperFirst .Name}}{})
 	if err != nil {
 		return nil, err
 	}
-	return {{.Name}}s, nil
+
+	{{.Name}}, err = s.repository.GetAll({{upperFirst .Name}}{}, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetAllResponse{
+		Total: total,
+		Data:  {{.Name}},
+	}, nil
 }
 
 // Update update a {{.Name}}.
-func (s *service) Update(id string, updateRequest UpdateRequest) error {
-	_, err := s.repository.Get(id)
-	if err != nil {
-		return err
-	}
-	return s.repository.Update({{upperFirst .Name}}{
-		ID:               id,
-{{range $fieldType := .UpdateRequestFields}}{{"\t"}}{{"\t"}}{{$fieldType.Field}}:{{"\t"}}updateRequest.{{$fieldType.Field}},{{"\n"}}{{end}} 
+func (s *service) Update(id string, updateRequest UpdateRequest) (*{{upperFirst .Name}}, error)  {
+	origin, err := s.repository.Get({{upperFirst .Name}}{
+		ID: id,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	{{.Name}} := updateRequest.override(*origin)
+
+	return &{{.Name}}, s.repository.Update({{.Name}})
 }
 
 // Delete delete a {{.Name}}.
 func (s *service) Delete(id string) error {
-	_, err := s.repository.Get(id)
-	if err != nil {
+	if _, err := s.repository.Get(id); err != nil {
 		return err
 	}
 	return s.repository.Delete(id)
 }
 `
 )
-
-// type serviceGenerator struct {
-// 	source transform.Internal
-// }
-
-// // NewServiceGenerator returns a new serviceGenerator.
-// func NewServiceGenerator(source transform.Internal) Generator {
-// 	return &serviceGenerator{source}
-// }
-
-// func (h *serviceGenerator) Generate(out io.Writer) error {
-// 	t := templateutil.GetTemplate()
-// 	t, err := t.Parse(serviceTpl)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return t.Execute(out, h.source)
-// }

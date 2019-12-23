@@ -62,13 +62,13 @@ func (u *{{upperFirst .Name}}Handler) Create{{upperFirst .Name}}(ctx *gin.Contex
 		return
 	}
 	repository := {{.Name}}.NewRepo(db)
-	uid, err := {{.Name}}.NewService(repository).Create(req)
+	response, err := {{.Name}}.NewService(repository).Create(req)
 	if err != nil {
 		u.logger.Error(err)
 		u.serviceError(ctx, err)
 		return
 	}
-	u.success(ctx, uid)
+	u.success(ctx, response)
 }
 
 // Get{{upperFirst .Name}} get {{.Name}}.
@@ -118,7 +118,7 @@ func (u *{{upperFirst .Name}}Handler) Get{{upperFirst .Name}}(ctx *gin.Context) 
 // @ID {{.Name}}-get-all
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} {{.Name}}.{{upperFirst .Name}}
+// @Success 200 {object} {{.Name}}.GetAllResponse
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
 // @Failure 500 {object} errorResponse
