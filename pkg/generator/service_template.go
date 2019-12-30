@@ -24,22 +24,19 @@ func NewService(rep Repository) Service {
 func (s *service) Create(createRequest CreateRequest) (*{{upperFirst .Name}}, error) {
 	uuid, _ := uuid.NewV4()
 	id := uuid.String()
-	{{.Name}} := createRequest.override({{upperFirst .Name}}{ID: id})
-	if err := s.repository.Create({{.Name}}); err != nil {
-		return nil, err
-	}
-	return &{{.Name}}, nil
+
+	{{.Name}} := createRequest.override({{upperFirst .Name}}{
+		ID: id,
+	})
+
+	return &{{.Name}}, s.repository.Create({{.Name}})
 }
 
 // Get get a {{.Name}}.
 func (s *service) Get(id string) (*{{upperFirst .Name}}, error) {
-	{{.Name}}, err := s.repository.Get({{upperFirst .Name}}{
+	return s.repository.Get(Datamodel{
 		ID: id,
 	})
-	if err != nil {
-		return nil, err
-	}
-	return {{.Name}}, nil
 }
 
 // GetAll get all {{.Name}}.
@@ -47,7 +44,7 @@ func (s *service) GetAll(arguments map[string][]string) (*GetAllResponse, error)
 	var (
 		total      int
 		err        error
-		{{.Name}} []{{upperFirst .Name}}
+		{{.Name}}s []{{upperFirst .Name}}
 	)
 
 	limit, offset, err := dbutil.Paginate(arguments)
@@ -62,14 +59,14 @@ func (s *service) GetAll(arguments map[string][]string) (*GetAllResponse, error)
 		return nil, err
 	}
 
-	{{.Name}}, err = s.repository.GetAll({{upperFirst .Name}}{}, limit, offset)
+	{{.Name}}s, err = s.repository.GetAll({{upperFirst .Name}}{}, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
 	return &GetAllResponse{
 		Total: total,
-		Data:  {{.Name}},
+		Data:  {{.Name}}s,
 	}, nil
 }
 
@@ -84,14 +81,17 @@ func (s *service) Update(id string, updateRequest UpdateRequest) (*{{upperFirst 
 
 	{{.Name}} := updateRequest.override(*origin)
 
-	return &{{.Name}}, s.repository.Update({{.Name}})
+	return &{{.Name}}, s.repository.Update(&{{.Name}})
 }
 
 // Delete delete a {{.Name}}.
 func (s *service) Delete(id string) error {
-	if _, err := s.repository.Get(id); err != nil {
+	if _, err := s.repository.Get(Datamodel{
+		ID: id,
+	}); err != nil {
 		return err
 	}
+	
 	return s.repository.Delete(id)
 }
 `

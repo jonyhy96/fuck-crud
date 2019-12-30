@@ -7,10 +7,10 @@ package {{.Name}}
 
 // Repository stands for interface that must be implemented.
 type Repository interface {
-	Create({{.Name}} {{upperFirst .Name}}) error
+	Create({{.Name}} *{{upperFirst .Name}}) error
 	Get({{.Name}} {{upperFirst .Name}}) (*{{upperFirst .Name}}, error)
 	GetAll({{.Name}} {{upperFirst .Name}}, limit int, offset int) ([]{{upperFirst .Name}}, error)
-	Update({{.Name}} {{upperFirst .Name}}) error
+	Update({{.Name}} *{{upperFirst .Name}}) error
 	Delete(id string) error
 }
 

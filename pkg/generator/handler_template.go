@@ -124,13 +124,16 @@ func (u *{{upperFirst .Name}}Handler) Get{{upperFirst .Name}}(ctx *gin.Context) 
 // @Failure 500 {object} errorResponse
 // @Router /{{.Name}}s [get]
 func (u *{{upperFirst .Name}}Handler) GetAll{{upperFirst .Name}}(ctx *gin.Context) {
+	var arguments = ctx.Request.URL.Query()
+
 	db, err := u.getDB()
 	if err != nil {
 		u.serviceError(ctx, err)
 		return
 	}
+
 	repository := {{.Name}}.NewRepo(db)
-	response, err := {{.Name}}.NewService(repository).GetAll()
+	response, err := {{.Name}}.NewService(repository).GetAll(arguments)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			u.logger.Error(err)
@@ -163,22 +166,26 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 		req {{.Name}}.UpdateRequest
 		id  = ctx.Param("id")
 	)
+
 	if err := uuid.ValidateUUID(id); err != nil {
 		u.logger.Error(err)
 		u.badRequest(ctx, err)
 		return
 	}
+
 	err := ctx.BindJSON(&req)
 	if err != nil {
 		u.logger.Error(err)
 		u.badRequest(ctx, err)
 		return
 	}
+
 	db, err := u.getDB()
 	if err != nil {
 		u.serviceError(ctx, err)
 		return
 	}
+
 	repository := {{.Name}}.NewRepo(db)
 	err = {{.Name}}.NewService(repository).Update(id, req)
 	if err != nil {
@@ -209,16 +216,19 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 // @Router /{{.Name}}s/{id} [delete]
 func (u *{{upperFirst .Name}}Handler) Delete{{upperFirst .Name}}(ctx *gin.Context) {
 	id := ctx.Param("id")
+
 	if err := uuid.ValidateUUID(id); err != nil {
 		u.logger.Error(err)
 		u.badRequest(ctx, err)
 		return
 	}
+
 	db, err := u.getDB()
 	if err != nil {
 		u.serviceError(ctx, err)
 		return
 	}
+	
 	repository := {{.Name}}.NewRepo(db)
 	err = {{.Name}}.NewService(repository).Delete(id)
 	if err != nil {

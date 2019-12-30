@@ -23,12 +23,8 @@ func NewRepo(db *gorm.DB) Repository {
 	}
 }
 
-func (repo *repo) Create({{.Name}} {{upperFirst .Name}}) error {
-	err := repo.db.Create(&{{.Name}}).Error
-	if err != nil {
-		return err
-	}
-	return nil
+func (repo *repo) Create({{.Name}} *{{upperFirst .Name}}) error {
+	return repo.db.Create(&{{.Name}}).Error
 }
 
 func (repo *repo) Get(where {{upperFirst .Name}}) (*{{upperFirst .Name}}, error) {
@@ -61,7 +57,7 @@ func (repo *repo) GetAll(where {{upperFirst .Name}}, limit int, offset int) ([]{
 	return {{.Name}}s, nil
 }
 
-func (repo *repo) Update({{.Name}} {{upperFirst .Name}}) error {
+func (repo *repo) Update({{.Name}} *{{upperFirst .Name}}) error {
 	return repo.db.Model(&{{.Name}}).Updates({{.Name}}).Error
 }
 
