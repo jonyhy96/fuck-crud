@@ -26,12 +26,12 @@ type Service interface {
 
 // {{upperFirst .Name}} handles {{.Name}} logic.
 type {{upperFirst .Name}} struct {
-{{range $fieldType := .Fields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}} {{jsontag .Name}} {{"\n"}}{{end}} 
+{{range $fieldType := .Fields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}} {{"\n"}}{{end}} 
 }
 
 // CreateRequest stands for a create request model.
 type CreateRequest struct {
-{{range $fieldType := .CreateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}} {{jsontag .Name}} {{"\n"}}{{end}} 
+{{range $fieldType := .CreateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}}  {{"\n"}}{{end}} 
 }
 
 func (c CreateRequest) override(in {{upperFirst .Name}}) {{upperFirst .Name}} {
@@ -51,7 +51,7 @@ func (c CreateRequest) Validate() []validate.Error {
 
 // UpdateRequest stands for a update request model.
 type UpdateRequest struct {
-{{range $fieldType := .UpdateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}} {{jsontag .Name}} {{"\n"}}{{end}} 
+{{range $fieldType := .UpdateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}}  {{"\n"}}{{end}} 
 }
 
 func (u UpdateRequest) override(in {{upperFirst .Name}}) {{upperFirst .Name}} {
@@ -71,8 +71,8 @@ func (u UpdateRequest) Validate() []validate.Error {
 
 // GetAllResponse GetAllResponse.
 type GetAllResponse struct {
-	Data  []{{upperFirst .Name}} {{jsontag "Data"}}
-	Total int {{jsontag "Total"}}
+	Data  []{{upperFirst .Name}}
+	Total int
 }
 `
 )

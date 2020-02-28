@@ -83,7 +83,10 @@ func generate(outputPath string) {
 			if err != nil {
 				panic(err)
 			}
-			generator.Generate(config, template, f)
+			err = generator.Generate(config, template, f)
+			if err != nil {
+				panic(err)
+			}
 		}(tpl, fileName)
 	}
 	wg.Wait()
