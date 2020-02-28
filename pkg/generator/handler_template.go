@@ -43,19 +43,28 @@ func (u *{{upperFirst .Name}}Handler) Init(router *gin.RouterGroup, engine stora
 // @Accept  json
 // @Produce  json
 // @Param {{.Name}} body {{.Name}}.CreateRequest true "{{.Name}}"
-// @Success 200 {string} string "id"
+// @Success 200 {object} {{.Name}}.{{upperFirst .Name}}
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /{{.Name}}s [post]
 func (u *{{upperFirst .Name}}Handler) Create{{upperFirst .Name}}(ctx *gin.Context) {
-	var req {{.Name}}.CreateRequest
-	err := ctx.BindJSON(&req)
+	var (
+		req {{.Name}}.CreateRequest
+	)
+	err := ctx.ShouldBind(&req)
 	if err != nil {
 		u.logger.Error(err)
 		u.badRequest(ctx, err)
 		return
 	}
+
+	if validateErrors := u.validate(req); validateErrors != nil {
+		u.logger.Error(validateErrors)
+		u.unprocessableEntity(ctx, validateErrors)
+		return
+	}
+
 	db, err := u.getDB()
 	if err != nil {
 		u.serviceError(ctx, err)
@@ -85,7 +94,9 @@ func (u *{{upperFirst .Name}}Handler) Create{{upperFirst .Name}}(ctx *gin.Contex
 // @Failure 500 {object} errorResponse
 // @Router /{{.Name}}s/{id} [get]
 func (u *{{upperFirst .Name}}Handler) Get{{upperFirst .Name}}(ctx *gin.Context) {
-	id := ctx.Param("id")
+	var (
+		id = ctx.Param("id")
+	) 
 	if err := uuid.ValidateUUID(id); err != nil {
 		u.logger.Error(err)
 		u.badRequest(ctx, err)
@@ -124,14 +135,15 @@ func (u *{{upperFirst .Name}}Handler) Get{{upperFirst .Name}}(ctx *gin.Context) 
 // @Failure 500 {object} errorResponse
 // @Router /{{.Name}}s [get]
 func (u *{{upperFirst .Name}}Handler) GetAll{{upperFirst .Name}}(ctx *gin.Context) {
-	var arguments = ctx.Request.URL.Query()
+	var (
+		arguments = ctx.Request.URL.Query()
+	)
 
 	db, err := u.getDB()
 	if err != nil {
 		u.serviceError(ctx, err)
 		return
 	}
-
 	repository := {{.Name}}.NewRepo(db)
 	response, err := {{.Name}}.NewService(repository).GetAll(arguments)
 	if err != nil {
@@ -156,7 +168,7 @@ func (u *{{upperFirst .Name}}Handler) GetAll{{upperFirst .Name}}(ctx *gin.Contex
 // @Produce  json
 // @Param id path string true "{{.Name}} id"
 // @Param {{.Name}} body {{.Name}}.UpdateRequest true "{{.Name}}"
-// @Success 200 {string} string "ok"
+// @Success 200 {object} {{.Name}}.{{upperFirst .Name}}
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
 // @Failure 500 {object} errorResponse
@@ -173,10 +185,16 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 		return
 	}
 
-	err := ctx.BindJSON(&req)
+	err := ctx.ShouldBind(&req)
 	if err != nil {
 		u.logger.Error(err)
 		u.badRequest(ctx, err)
+		return
+	}
+
+	if validateErrors := u.validate(req); validateErrors != nil {
+		u.logger.Error(validateErrors)
+		u.unprocessableEntity(ctx, validateErrors)
 		return
 	}
 
@@ -185,9 +203,8 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 		u.serviceError(ctx, err)
 		return
 	}
-
 	repository := {{.Name}}.NewRepo(db)
-	err = {{.Name}}.NewService(repository).Update(id, req)
+	response, err = {{.Name}}.NewService(repository).Update(id, req)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			u.logger.Error(err)
@@ -198,7 +215,7 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 		u.serviceError(ctx, err)
 		return
 	}
-	u.success(ctx, nil)
+	u.success(ctx, response)
 }
 
 // Delete{{upperFirst .Name}} delete {{.Name}}.
@@ -215,7 +232,9 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 // @Failure 500 {object} errorResponse
 // @Router /{{.Name}}s/{id} [delete]
 func (u *{{upperFirst .Name}}Handler) Delete{{upperFirst .Name}}(ctx *gin.Context) {
-	id := ctx.Param("id")
+	var (
+		id = ctx.Param("id")
+	)
 
 	if err := uuid.ValidateUUID(id); err != nil {
 		u.logger.Error(err)
@@ -228,7 +247,6 @@ func (u *{{upperFirst .Name}}Handler) Delete{{upperFirst .Name}}(ctx *gin.Contex
 		u.serviceError(ctx, err)
 		return
 	}
-	
 	repository := {{.Name}}.NewRepo(db)
 	err = {{.Name}}.NewService(repository).Delete(id)
 	if err != nil {

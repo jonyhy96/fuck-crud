@@ -31,6 +31,9 @@ func (repo *repo) Get(where {{upperFirst .Name}}) (*{{upperFirst .Name}}, error)
 	var {{.Name}} {{upperFirst .Name}}
 
 	if err := repo.db.Find(&{{.Name}},where).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("%w with id: %s", err, where.ID)
+		}
 		return nil, err
 	}
 

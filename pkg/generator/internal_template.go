@@ -12,14 +12,15 @@ type Repository interface {
 	GetAll({{.Name}} {{upperFirst .Name}}, limit int, offset int) ([]{{upperFirst .Name}}, error)
 	Update({{.Name}} *{{upperFirst .Name}}) error
 	Delete(id string) error
+	Count({{.Name}} {{upperFirst .Name}}) (int, error)
 }
 
 // Service stands for interface that must be implemented.
 type Service interface {
-	Create({{.Name}} CreateRequest) (*{{.Name}} {{upperFirst .Name}}, error)
+	Create({{.Name}} CreateRequest) (*{{upperFirst .Name}}, error)
 	Get(id string) (*{{upperFirst .Name}}, error)
 	GetAll(arguments map[string][]string) (*GetAllResponse, error)
-	Update(id string, {{.Name}} UpdateRequest) (*{{.Name}} {{upperFirst .Name}}, error)
+	Update(id string, {{.Name}} UpdateRequest) (*{{upperFirst .Name}}, error)
 	Delete(id string) error
 }
 
@@ -41,6 +42,13 @@ func (c CreateRequest) override(in {{upperFirst .Name}}) {{upperFirst .Name}} {
 	return in
 }
 
+// Validate implements validate.Validator.
+func (c CreateRequest) Validate() []validate.Error {
+	var errors []validate.Error
+
+	return errors
+}
+
 // UpdateRequest stands for a update request model.
 type UpdateRequest struct {
 {{range $fieldType := .UpdateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}} {{"\n"}}{{end}} 
@@ -52,6 +60,13 @@ func (u UpdateRequest) override(in {{upperFirst .Name}}) {{upperFirst .Name}} {
 		in.{{$fieldType.Field}} = u.{{$fieldType.Field}}
 	}{{end}}
 	return in
+}
+
+// Validate implements validate.Validator.
+func (u UpdateRequest) Validate() []validate.Error {
+	var errors []validate.Error
+
+	return errors
 }
 
 // GetAllResponse GetAllResponse.
