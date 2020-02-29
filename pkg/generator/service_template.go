@@ -34,7 +34,7 @@ func (s *service) Create(createRequest CreateRequest) (*{{upperFirst .Name}}, er
 
 // Get get a {{.Name}}.
 func (s *service) Get(id string) (*{{upperFirst .Name}}, error) {
-	return s.repository.Get(Datamodel{
+	return s.repository.Get({{upperFirst .Name}}{
 		ID: id,
 	})
 }
@@ -86,7 +86,7 @@ func (s *service) Update(id string, updateRequest UpdateRequest) (*{{upperFirst 
 
 // Delete delete a {{.Name}}.
 func (s *service) Delete(id string) error {
-	if _, err := s.repository.Get(Datamodel{
+	if _, err := s.repository.Get({{upperFirst .Name}}{
 		ID: id,
 	}); err != nil {
 		return err
