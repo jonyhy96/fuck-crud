@@ -24,11 +24,13 @@ type Service interface {
 	Delete(id string) error
 }
 
+//go:generate gomodifytags -file $GOFILE -struct {{upperFirst .Name}} -add-tags json --skip-unexported -transform camelcase -w
 // {{upperFirst .Name}} handles {{.Name}} logic.
 type {{upperFirst .Name}} struct {
 {{range $fieldType := .Fields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}} {{"\n"}}{{end}} 
 }
 
+//go:generate gomodifytags -file $GOFILE -struct CreateRequest -add-tags json --skip-unexported -transform camelcase -w
 // CreateRequest stands for a create request model.
 type CreateRequest struct {
 {{range $fieldType := .CreateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}}  {{"\n"}}{{end}} 
@@ -49,6 +51,7 @@ func (c CreateRequest) Validate() []validate.Error {
 	return errors
 }
 
+//go:generate gomodifytags -file $GOFILE -struct UpdateRequest -add-tags json --skip-unexported -transform camelcase -w
 // UpdateRequest stands for a update request model.
 type UpdateRequest struct {
 {{range $fieldType := .UpdateRequestFields}}{{"\t"}}{{$fieldType.Field}}   {{$fieldType.Type}}  {{"\n"}}{{end}} 
