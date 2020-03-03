@@ -29,7 +29,7 @@ func (s *service) Create(createRequest CreateRequest) (*{{upperFirst .Name}}, er
 		ID: id,
 	})
 
-	return &{{.Name}}, s.repository.Create({{.Name}})
+	return &{{.Name}}, s.repository.Create(&{{.Name}})
 }
 
 // Get get a {{.Name}}.

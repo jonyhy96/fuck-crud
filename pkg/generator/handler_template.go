@@ -204,7 +204,7 @@ func (u *{{upperFirst .Name}}Handler) Update{{upperFirst .Name}}(ctx *gin.Contex
 		return
 	}
 	repository := {{.Name}}.NewRepo(db)
-	response, err = {{.Name}}.NewService(repository).Update(id, req)
+	response, err := {{.Name}}.NewService(repository).Update(id, req)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			u.logger.Error(err)
