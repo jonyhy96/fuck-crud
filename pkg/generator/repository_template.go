@@ -40,7 +40,7 @@ func (repo *repo) Get(where {{upperFirst .Name}}) (*{{upperFirst .Name}}, error)
 	return &{{.Name}}, nil
 }
 
-func (repo *repo) Count(where {{upperFirst .Name}}) (int, error) {
+func (repo *repo) Count(where map[string]interface{}) (int, error) {
 	var total int
 
 	if err := repo.db.Model({{upperFirst .Name}}{}).Where(where).Count(&total).Error; err != nil {
@@ -50,7 +50,7 @@ func (repo *repo) Count(where {{upperFirst .Name}}) (int, error) {
 	return total, nil
 }
 
-func (repo *repo) GetAll(where {{upperFirst .Name}}, limit int, offset int) ([]{{upperFirst .Name}}, error) {
+func (repo *repo) GetAll(where map[string]interface{}, limit int, offset int) ([]{{upperFirst .Name}}, error) {
 	var {{.Name}}s []{{upperFirst .Name}}
 
 	if err := repo.db.Limit(limit).Offset(offset).Order("updated_at DESC").Find(&{{.Name}}s,where).Error; err != nil {

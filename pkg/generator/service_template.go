@@ -59,7 +59,7 @@ func (s *service) GetAll(arguments map[string][]string) (*GetAllResponse, error)
 		return nil, err
 	}
 
-	{{.Name}}s, err = s.repository.GetAll({{upperFirst .Name}}{}, limit, offset)
+	{{.Name}}s, err = s.repository.GetAll(nil, limit, offset)
 	if err != nil {
 		return nil, err
 	}

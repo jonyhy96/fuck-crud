@@ -9,10 +9,10 @@ package {{.Name}}
 type Repository interface {
 	Create({{.Name}} *{{upperFirst .Name}}) error
 	Get({{.Name}} {{upperFirst .Name}}) (*{{upperFirst .Name}}, error)
-	GetAll({{.Name}} {{upperFirst .Name}}, limit int, offset int) ([]{{upperFirst .Name}}, error)
+	GetAll(where map[string]interface{}, limit int, offset int) ([]{{upperFirst .Name}}, error)
 	Update({{.Name}} *{{upperFirst .Name}}) error
 	Delete(id string) error
-	Count({{.Name}} {{upperFirst .Name}}) (int, error)
+	Count(where map[string]interface{}) (int, error)
 }
 
 // Service stands for interface that must be implemented.
